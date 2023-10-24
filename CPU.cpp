@@ -105,7 +105,7 @@ bool CPU::decode(Instruction *current)
         writebackValue = aluOutput;
 
     if (this->controller.readSignal(CS::MemWrite))
-        this->memUnit.writeData(aluOutput, rs2.to_ulong());
+        this->memUnit.writeData(aluOutput, rs2Data);
 
     if (this->controller.readSignal(CS::RegWrite))
         this->regFile.writeRegister(rd.to_ulong(), writebackValue);
