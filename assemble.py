@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Compile a RISC-V .s file into the instMem format."""
+"""Assemble a RISC-V .s file into the instMem format."""
 
 from argparse import ArgumentParser
 import io
@@ -32,7 +32,7 @@ R_Type = Literal["add", "sub", "xor", "sra"]
 I_Type = Literal["addi", "andi"]
 
 
-def compile_r_type(rd: str, rs1: str, rs2: str, command: R_Type) -> str:
+def assemble_r_type(rd: str, rs1: str, rs2: str, command: R_Type) -> str:
     opcode = "0110011"
     if command in {"add", "xor"}:
         funct7 = "0000000"
@@ -47,7 +47,7 @@ def compile_r_type(rd: str, rs1: str, rs2: str, command: R_Type) -> str:
     return funct7 + rs2 + rs1 + funct3 + rd + opcode
 
 
-def compile_i_type(rd: str, rs1: str, immediate: str, command: I_Type) -> str:
+def assemble_i_type(rd: str, rs1: str, immediate: str, command: I_Type) -> str:
     opcode = "0010011"
     if command == "addi":
         funct3 = "000"
@@ -56,19 +56,19 @@ def compile_i_type(rd: str, rs1: str, immediate: str, command: I_Type) -> str:
     return immediate + rs1 + funct3 + rd + opcode
 
 
-def compile_lw(rd: str, rs1: str, immediate: str) -> str:
+def assemble_lw(rd: str, rs1: str, immediate: str) -> str:
     opcode = "0000011"
     funct3 = "010"
     return immediate + rs1 + funct3 + rd + opcode
 
 
-def compile_sw(rs1: str, rs2: str, immediate: str) -> str:
+def assemble_sw(rs1: str, rs2: str, immediate: str) -> str:
     opcode = "0100011"
     funct3 = "010"
     return immediate[:7] + rs2 + rs1 + funct3 + immediate[7:] + opcode
 
 
-def compile_blt(rs1: str, rs2: str, immediate: str) -> str:
+def assemble_blt(rs1: str, rs2: str, immediate: str) -> str:
     opcode = "1100011"
     funct3 = "100"
     return (immediate[0] + immediate[2:8]
@@ -77,7 +77,7 @@ def compile_blt(rs1: str, rs2: str, immediate: str) -> str:
             + opcode)
 
 
-def compile_jalr(rd: str, rs1: str, immediate: str) -> str:
+def assemble_jalr(rd: str, rs1: str, immediate: str) -> str:
     opcode = "1100111"
     funct3 = "000"
     return immediate + rs1 + funct3 + rd + opcode
@@ -141,7 +141,7 @@ def tokenize_line(line: str) -> list[str]:
     return tokens
 
 
-def compile_assembly(source_path: Path) -> str:
+def assemble_source(source_path: Path) -> str:
     assembly_source = source_path.read_text(encoding="utf-8").strip()
     assembly_lines = assembly_source.splitlines()
 
@@ -161,30 +161,30 @@ def compile_assembly(source_path: Path) -> str:
                 rd_bin = register_to_binary(operand1)
                 rs1_bin = register_to_binary(operand2)
                 rs2_bin = register_to_binary(operand3)
-                instr = compile_r_type(rd_bin, rs1_bin, rs2_bin, command)
+                instr = assemble_r_type(rd_bin, rs1_bin, rs2_bin, command)
             case "addi" | "andi" | "jalr":
                 rd_bin = register_to_binary(operand1)
                 rs1_bin = register_to_binary(operand2)
                 immediate_bin = immediate_to_binary(operand3, 12)
                 if command == "jalr":
-                    instr = compile_jalr(rd_bin, rs1_bin, immediate_bin)
+                    instr = assemble_jalr(rd_bin, rs1_bin, immediate_bin)
                 else:
-                    instr = compile_i_type(rd_bin, rs1_bin, immediate_bin, command)
+                    instr = assemble_i_type(rd_bin, rs1_bin, immediate_bin, command)
             case "lw":
                 rd_bin = register_to_binary(operand1)
                 immediate_bin = immediate_to_binary(operand2, 12)
                 rs1_bin = register_to_binary(operand3)
-                instr = compile_lw(rd_bin, rs1_bin, immediate_bin)
+                instr = assemble_lw(rd_bin, rs1_bin, immediate_bin)
             case "sw":
                 rs2_bin = register_to_binary(operand1)
                 immediate_bin = immediate_to_binary(operand2, 12)
                 rs1_bin = register_to_binary(operand3)
-                instr = compile_sw(rs1_bin, rs2_bin, immediate_bin)
+                instr = assemble_sw(rs1_bin, rs2_bin, immediate_bin)
             case "blt":
                 rs1_bin = register_to_binary(operand1)
                 rs2_bin = register_to_binary(operand2)
                 immediate_bin = immediate_to_binary(operand3, 13)
-                instr = compile_blt(rs1_bin, rs2_bin, immediate_bin)
+                instr = assemble_blt(rs1_bin, rs2_bin, immediate_bin)
             case _:
                 raise ValueError(f"unrecognized command {command}")
 
@@ -200,7 +200,7 @@ def main() -> None:
     source_path: Path = namespace.source_path
     dest_path: Path | None = namespace.dest_path
 
-    output = compile_assembly(source_path)
+    output = assemble_source(source_path)
     if dest_path is None:
         print(output)
     else:
