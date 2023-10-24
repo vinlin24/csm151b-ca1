@@ -8,6 +8,12 @@
 #
 #       make clean
 #
+# 	* To run individual tests:
+#
+#		make test-r
+#		make test-sw
+#		make test-all
+#
 # ===============================================
 
 # Attribution: Makefile partially paraphrased from output of ChatGPT.
@@ -33,4 +39,13 @@ $(OUTFILE): $(OBJS) $(HEADERS)
 clean:
 	rm -f $(OBJS) $(OUTFILE)
 
-.PHONY: clean
+test-r:
+	./$(OUTFILE) traces/23instMem-r.txt
+
+test-sw:
+	./$(OUTFILE) traces/23instMem-sw.txt
+
+test-all:
+	./$(OUTFILE) traces/23instMem-all.txt
+
+.PHONY: clean test-r test-sw test-all
