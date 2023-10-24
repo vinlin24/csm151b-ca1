@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Controller.h"
+#include "RegFile.h"
 
 class Instruction
 {
@@ -34,6 +35,11 @@ private:
      * instruction.
      */
     Controller controller;
+    /**
+     * Register file unit responsible for keeping track of the values currently
+     * stored in the registers.
+     */
+    RegFile regfile;
 
 public:
     CPU();
