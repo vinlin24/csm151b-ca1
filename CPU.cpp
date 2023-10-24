@@ -34,7 +34,6 @@ uint32_t CPU::fetch(bitset<8> *instructionMemory)
                            ((instructionMemory[PC + 1].to_ulong()) << 8) +
                            (instructionMemory[PC + 0].to_ulong());
     cerr << "\nCPU::fetch: PC=" << this->PC << endl;
-    this->PC += 4;
     return instruction;
 }
 
@@ -109,9 +108,8 @@ bool CPU::execute(CPU::InstructionParts const &parts)
     else
         aluOutput = this->alu.compute(rs1Data, rs2Data, aluOperation);
 
-    // TODO: do something with signFlag.
     bool signFlag = this->alu.readSignFlag();
-    cerr << "CPU::decode: aluOutput = " << aluOutput
+    cerr << "CPU::execute: aluOutput = " << aluOutput
          << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
 
     int32_t writebackValue;
@@ -125,6 +123,18 @@ bool CPU::execute(CPU::InstructionParts const &parts)
 
     if (this->controller.readSignal(CS::RegWrite))
         this->regFile.writeRegister(parts.rd.to_ulong(), writebackValue);
+
+    // Update the PC appropriately.
+    if (this->controller.readSignal(CS::Branch) && signFlag)
+    {
+        this->PC += parts.immediate;
+        cerr << "CPU::execute: jumped by " << parts.immediate << " to address "
+             << this->PC << endl;
+    }
+    else
+    {
+        this->PC += 4;
+    }
 
     return true;
 }
