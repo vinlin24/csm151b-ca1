@@ -18,7 +18,7 @@ CXXFLAGS = -Wall -Werror -Wextra -Wpedantic
 OUTFILE = cpusim
 SRCS = $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
-HEADERS = CPU.h
+HEADERS = CPU.h Controller.h
 
 default: $(OUTFILE)
 
