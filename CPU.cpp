@@ -98,11 +98,17 @@ bool CPU::decode(Instruction *current)
     cerr << "CPU::decode: aluOutput = " << aluOutput
          << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
 
-    // TODO: do something with memory. For now, assume the output of ALU goes
-    // straight to writeback.
+    int32_t writebackValue;
+    if (this->controller.readSignal(CS::MemRead))
+        writebackValue = this->memUnit.readData(aluOutput);
+    else
+        writebackValue = aluOutput;
+
+    if (this->controller.readSignal(CS::MemWrite))
+        this->memUnit.writeData(aluOutput, rs2.to_ulong());
 
     if (this->controller.readSignal(CS::RegWrite))
-        this->regFile.writeRegister(rd.to_ulong(), aluOutput);
+        this->regFile.writeRegister(rd.to_ulong(), writebackValue);
 
     return true;
 }
