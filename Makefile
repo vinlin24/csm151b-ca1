@@ -48,4 +48,7 @@ test-sw:
 test-all:
 	./$(OUTFILE) traces/23instMem-all.txt
 
-.PHONY: clean test-r test-sw test-all
+test1:
+	./$(OUTFILE) traces/23instMem-test1.txt
+
+.PHONY: clean test-r test-sw test-all test1
