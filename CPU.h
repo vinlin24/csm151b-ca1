@@ -10,17 +10,6 @@
 #include "MemUnit.h"
 #include "RegFile.h"
 
-class Instruction
-{
-public:
-    Instruction();
-    Instruction(std::bitset<32> fetch);
-    /**
-     * The underlying 32-bit bit pattern representing the instruction.
-     */
-    std::bitset<32> instruction;
-};
-
 class CPU
 {
 public:
@@ -96,13 +85,13 @@ private:
     /**
      * Fetch the current 32-bit instruction from the instruction memory.
      */
-    std::bitset<32> fetch(std::bitset<8> *instructionMemory);
+    uint32_t fetch(std::bitset<8> *instructionMemory);
 
     /**
      * Decode the given instruction by setting the appropriate controller
      * signals and returning the parsed parts of the instruction.
      */
-    InstructionParts decode(Instruction *instruction);
+    InstructionParts decode(uint32_t instruction);
 
     /**
      * Execute the instruction and returns whether the CPU is still active i.e.

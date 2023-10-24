@@ -72,27 +72,18 @@ int main(int argc, char *argv[])
      * instruction, decoding, etc.).
      */
 
-    // call the appropriate constructor here to initialize the processor...
     CPU cpu;
-    // make sure to create a variable for PC and resets it to zero (e.g.,
-    // unsigned int PC = 0);
-
-    /* OPTIONAL: Instantiate your Instruction object here. */
-
-    bitset<32> current;
-    Instruction instruction;
-
     int32_t a0Value = 0;
     int32_t a1Value = 0;
 
-    // processor's main loop. Each iteration is equal to one clock cycle.
+    // Processor's main loop. Each iteration is equal to one clock cycle.
     while (cpu.runCycle(instructionMemory))
     {
         // Query the registers to test.
         a0Value = cpu.peekRegister(REG_A0);
         a1Value = cpu.peekRegister(REG_A1);
 
-        // sanity check
+        // Sanity check.
         if (cpu.readPC() > maxPC)
             break;
     }

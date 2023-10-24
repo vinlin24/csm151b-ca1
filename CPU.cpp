@@ -4,13 +4,6 @@
 
 using namespace std;
 
-Instruction::Instruction() {}
-
-Instruction::Instruction(bitset<32> fetch)
-{
-    this->instruction = fetch;
-}
-
 CPU::CPU()
 {
     this->PC = 0;
@@ -18,43 +11,40 @@ CPU::CPU()
 
 bool CPU::runCycle(bitset<8> *instructionMemory)
 {
-    bitset<32> instruction = this->fetch(instructionMemory);
-    Instruction current(instruction);
-    InstructionParts parts = this->decode(&current);
+    uint32_t instruction = this->fetch(instructionMemory);
+    InstructionParts parts = this->decode(instruction);
     bool stillRunning = this->execute(parts);
     return stillRunning;
 }
 
-bitset<32> CPU::fetch(bitset<8> *instructionMemory)
+uint32_t CPU::fetch(bitset<8> *instructionMemory)
 {
-    // get 32 bit instruction
-    bitset<32> instruction = ((((instructionMemory[PC + 3].to_ulong()) << 24)) +
-                              ((instructionMemory[PC + 2].to_ulong()) << 16) +
-                              ((instructionMemory[PC + 1].to_ulong()) << 8) +
-                              (instructionMemory[PC + 0].to_ulong()));
+    uint32_t instruction = (((instructionMemory[PC + 3].to_ulong()) << 24)) +
+                           ((instructionMemory[PC + 2].to_ulong()) << 16) +
+                           ((instructionMemory[PC + 1].to_ulong()) << 8) +
+                           (instructionMemory[PC + 0].to_ulong());
     cerr << "\nCPU::fetch: PC=" << this->PC << endl;
     this->PC += 4;
     return instruction;
 }
 
-CPU::InstructionParts CPU::decode(Instruction *current)
+CPU::InstructionParts CPU::decode(uint32_t instruction)
 {
     cerr << "CPU::decode: received instruction: "
-         << current->instruction.to_string() << endl;
+         << bitset<32>(instruction).to_string() << endl;
 
     // Split up the instruction as illustrated in the datapath design.
     InstructionParts parts;
-    uint32_t bits = current->instruction.to_ulong();
-    parts.opcode = (bits & 0b1111111);
-    parts.rs1 = ((bits & (0b11111 << 15)) >> 15);
-    parts.rs2 = ((bits & (0b11111 << 20)) >> 20);
-    parts.rd = ((bits & (0b11111 << 7)) >> 7);
-    parts.funct3 = ((bits & (0b111 << 12)) >> 12);
-    parts.bit30 = (bits & (1 << 30));
+    parts.opcode = (instruction & 0b1111111);
+    parts.rs1 = ((instruction & (0b11111 << 15)) >> 15);
+    parts.rs2 = ((instruction & (0b11111 << 20)) >> 20);
+    parts.rd = ((instruction & (0b11111 << 7)) >> 7);
+    parts.funct3 = ((instruction & (0b111 << 12)) >> 12);
+    parts.bit30 = (instruction & (1 << 30));
 
     // Also decode the immediate.
     Opcodes opcodeBits = static_cast<Opcodes>(parts.opcode.to_ulong());
-    parts.immediate = this->immGen.generate(bits, opcodeBits);
+    parts.immediate = this->immGen.generate(instruction, opcodeBits);
 
     cerr << "CPU::decode: opcode, bits[6:0] is: "
          << parts.opcode.to_string() << endl;
