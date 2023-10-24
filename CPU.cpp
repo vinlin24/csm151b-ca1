@@ -81,13 +81,13 @@ bool CPU::decode(Instruction *current)
     Opcodes opcodeBits = static_cast<Opcodes>(opcode.to_ulong());
     int32_t immediate = this->immGen.generate(bits, opcodeBits);
 
-    uint32_t rs1Data = this->regFile.readRegister(rs1.to_ulong());
-    uint32_t rs2Data = this->regFile.readRegister(rs2.to_ulong());
+    int32_t rs1Data = this->regFile.readRegister(rs1.to_ulong());
+    int32_t rs2Data = this->regFile.readRegister(rs2.to_ulong());
 
     ALUOperation aluOperation = this->aluControl.resolveOperation(
         aluOp, bit30, funct3);
 
-    uint32_t aluOutput;
+    int32_t aluOutput;
     if (this->controller.readSignal(CS::AluSrc))
         aluOutput = this->alu.compute(rs1Data, immediate, aluOperation);
     else

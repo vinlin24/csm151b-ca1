@@ -9,8 +9,8 @@ class RegFile
 {
 public:
     RegFile();
-    uint32_t readRegister(uint8_t registerNum) const;
-    void writeRegister(uint8_t registerNum, uint32_t data);
+    int32_t readRegister(uint8_t registerNum) const;
+    void writeRegister(uint8_t registerNum, int32_t data);
 
 private:
     uint32_t registers[NUM_REGISTERS];

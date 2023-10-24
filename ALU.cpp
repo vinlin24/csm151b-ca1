@@ -10,9 +10,9 @@ ALU::ALU()
     this->signFlag = false;
 }
 
-uint32_t ALU::compute(uint32_t input1, uint32_t input2, ALUOperation operation)
+int32_t ALU::compute(int32_t input1, int32_t input2, ALUOperation operation)
 {
-    uint32_t result;
+    int32_t result;
     switch (operation)
     {
     case ALUOperation::ALU_ADD:
@@ -25,14 +25,15 @@ uint32_t ALU::compute(uint32_t input1, uint32_t input2, ALUOperation operation)
         result = input1 ^ input2;
         break;
     case ALUOperation::ALU_SRA:
-        result = static_cast<int32_t>(input1) >> (input2 & 0b11111);
+        result = input1 >> (input2 & 0b11111);
         break;
     case ALUOperation::ALU_AND:
         result = input1 & input2;
         break;
+    default:
+        throw std::invalid_argument("ALU received unknown operation.");
     }
-    int signBit = result & (1 << 31);
-    this->signFlag = static_cast<bool>(signBit);
+    this->signFlag = (result < 0);
     return result;
 }
 

@@ -19,7 +19,7 @@ class ALU
 {
 public:
     ALU();
-    uint32_t compute(uint32_t input1, uint32_t input2, ALUOperation operation);
+    int32_t compute(int32_t input1, int32_t input2, ALUOperation operation);
     bool readSignFlag() const;
 
 private:
