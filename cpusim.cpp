@@ -1,5 +1,3 @@
-#include "CPU.h"
-
 #include <bitset>
 #include <fstream>
 #include <iostream>
@@ -8,7 +6,18 @@
 #include <stdlib.h>
 #include <string>
 
+#include "CPU.h"
+
 using namespace std;
+
+/**
+ * a0 is the symbolic name for register x10.
+ */
+#define REG_A0 10
+/**
+ * a1 is the symbolic name for register x11.
+ */
+#define REG_A1 11
 
 /*
  * This is the front end of your project. You need to first read the
@@ -73,6 +82,9 @@ int main(int argc, char *argv[])
     bitset<32> current;
     Instruction instruction;
 
+    int32_t a0Value = 0;
+    int32_t a1Value = 0;
+
     // processor's main loop. Each iteration is equal to one clock cycle.
     bool active = true;
     while (active)
@@ -87,19 +99,18 @@ int main(int argc, char *argv[])
         // break from loop so stats are not mistakenly updated
         if (!active)
             break;
-        // the rest should be implemented here ...
-        // ...
+
+        // Query the registers to test.
+        a0Value = cpu.peekRegister(REG_A0);
+        a1Value = cpu.peekRegister(REG_A1);
 
         // sanity check
         if (cpu.readPC() > maxPC)
             break;
     }
 
-    int a0 = 0;
-    int a1 = 0;
-    // TODO: print the results (you should replace a0 and a1 with your own
-    // variables that point to a0 and a1)
-    cout << "(" << a0 << "," << a1 << ")" << endl;
+    // Final one-line output, formatted the exact way described in the spec.
+    cout << "(" << a0Value << "," << a1Value << ")" << endl;
 
     return EXIT_SUCCESS;
 }

@@ -1,5 +1,6 @@
 #include <bitset>
 #include <iostream>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -72,4 +73,8 @@ public:
      * active i.e. `false` if the program should terminate.
      */
     bool decode(Instruction *instruction);
+    /**
+     * View the value currently stored in the specific register.
+     */
+    int32_t peekRegister(uint8_t registerNum) const;
 };

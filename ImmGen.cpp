@@ -66,7 +66,6 @@ int32_t ImmGen::generate(uint32_t instruction, Opcodes opcode)
 {
     switch (opcode)
     {
-
     case Opcodes::I_TYPE:
     case Opcodes::LW:
     case Opcodes::JALR:

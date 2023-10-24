@@ -115,3 +115,8 @@ unsigned long CPU::readPC()
 {
     return this->PC;
 }
+
+int32_t CPU::peekRegister(uint8_t registerNum) const
+{
+    return this->regfile.readRegister(registerNum);
+}
