@@ -2,40 +2,39 @@
 
 using namespace std;
 
-instruction::instruction(bitset<32> fetch)
+Instruction::Instruction() {}
+
+Instruction::Instruction(bitset<32> fetch)
 {
-    // cout << fetch << endl;
-    instr = fetch;
-    // cout << instr << endl;
+    this->instruction = fetch;
 }
 
 CPU::CPU()
 {
-    PC = 0;                        // set PC to 0
-    for (int i = 0; i < 4096; i++) // copy instrMEM
+    this->PC = 0;
+    for (int i = 0; i < 4096; i++)
     {
-        dmemory[i] = (0);
+        this->dataMemory[i] = (0);
     }
 }
 
-bitset<32> CPU::Fetch(bitset<8> *instmem)
+bitset<32> CPU::fetch(bitset<8> *instructionMemory)
 {
     // get 32 bit instruction
-    bitset<32> instr = ((((instmem[PC + 3].to_ulong()) << 24)) +
-                        ((instmem[PC + 2].to_ulong()) << 16) +
-                        ((instmem[PC + 1].to_ulong()) << 8) +
-                        (instmem[PC + 0].to_ulong()));
-    PC += 4; // increment PC
-    return instr;
+    bitset<32> instruction = ((((instructionMemory[PC + 3].to_ulong()) << 24)) +
+                              ((instructionMemory[PC + 2].to_ulong()) << 16) +
+                              ((instructionMemory[PC + 1].to_ulong()) << 8) +
+                              (instructionMemory[PC + 0].to_ulong()));
+    this->PC += 4;
+    return instruction;
 }
 
-bool CPU::Decode(instruction *curr)
+bool CPU::decode(Instruction *current)
 {
-    // cout<<curr->instr<<endl;
-    return true;
+    return true; // TODO.
 }
 
 unsigned long CPU::readPC()
 {
-    return PC;
+    return this->PC;
 }

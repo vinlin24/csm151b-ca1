@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
      * operands, etc.
      */
 
-    bitset<8> instMem[4096];
+    bitset<8> instructionMemory[4096];
 
     if (argc < 2)
     {
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         stringstream line2(line);
         int x;
         line2 >> x;
-        instMem[i] = bitset<8>(x);
+        instructionMemory[i] = bitset<8>(x);
         i++;
     }
     int maxPC = i;
@@ -64,40 +64,41 @@ int main(int argc, char *argv[])
      */
 
     // call the appropriate constructor here to initialize the processor...
-    CPU myCPU;
+    CPU cpu;
     // make sure to create a variable for PC and resets it to zero (e.g.,
     // unsigned int PC = 0);
 
     /* OPTIONAL: Instantiate your Instruction object here. */
-    // Instruction myInst;
-    bitset<32> curr;
-    instruction instr = instruction(curr);
+
+    bitset<32> current;
+    Instruction instruction;
 
     // processor's main loop. Each iteration is equal to one clock cycle.
-    bool done = true;
-    while (done)
+    bool active = true;
+    while (active)
     {
         // fetch
-        curr = myCPU.Fetch(instMem); // fetching the instruction
-        instr = instruction(curr);
+        current = cpu.fetch(instructionMemory); // fetching the instruction
+        instruction = Instruction(current);
 
         // decode
-        done = myCPU.Decode(&instr);
+        active = cpu.decode(&instruction);
 
         // break from loop so stats are not mistakenly updated
-        if (done == false)
+        if (!active)
             break;
         // the rest should be implemented here ...
         // ...
 
         // sanity check
-        if (myCPU.readPC() > maxPC)
+        if (cpu.readPC() > maxPC)
             break;
     }
+
     int a0 = 0;
     int a1 = 0;
-    // print the results (you should replace a0 and a1 with your own variables
-    // that point to a0 and a1)
+    // TODO: print the results (you should replace a0 and a1 with your own
+    // variables that point to a0 and a1)
     cout << "(" << a0 << "," << a1 << ")" << endl;
 
     return EXIT_SUCCESS;
