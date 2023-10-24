@@ -153,7 +153,7 @@ void CPU::updatePC(int32_t immediate, int32_t writebackValue)
     }
     else if (this->controller.readSignal(CS::Branch) && signFlag)
     {
-        uint32_t offset = static_cast<uint32_t>(immediate & ~1);
+        uint32_t offset = static_cast<uint32_t>(immediate << 1);
         this->PC += offset;
         cerr << "CPU::updatePC: jumped by " << offset << " to address "
              << this->PC << endl;
