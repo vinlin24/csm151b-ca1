@@ -4,6 +4,11 @@
 
 using namespace std;
 
+/**
+ * ra is the symbolic name for register x1.
+ */
+#define REG_RA 1
+
 CPU::CPU()
 {
     this->PC = 0;
@@ -39,8 +44,8 @@ uint32_t CPU::fetch(bitset<8> *instructionMemory)
 
 CPU::InstructionParts CPU::decode(uint32_t instruction)
 {
-    cerr << "CPU::decode: received instruction: "
-         << bitset<32>(instruction).to_string() << endl;
+    // cerr << "CPU::decode: received instruction: "
+    //      << bitset<32>(instruction).to_string() << endl;
 
     // Split up the instruction as illustrated in the datapath design.
     InstructionParts parts;
@@ -55,20 +60,20 @@ CPU::InstructionParts CPU::decode(uint32_t instruction)
     Opcodes opcodeBits = static_cast<Opcodes>(parts.opcode.to_ulong());
     parts.immediate = this->immGen.generate(instruction, opcodeBits);
 
-    cerr << "CPU::decode: opcode, bits[6:0] is: "
-         << parts.opcode.to_string() << endl;
-    cerr << "CPU::decode: rs1, bits[19:15] is: "
-         << parts.rs1.to_string() << endl;
-    cerr << "CPU::decode: rs2, bits[24:20] is: "
-         << parts.rs2.to_string() << endl;
-    cerr << "CPU::decode: rd, bits[11:7] is: "
-         << parts.rd.to_string() << endl;
-    cerr << "CPU::decode: funct3, bits[14:12] is: "
-         << parts.funct3.to_string() << endl;
-    cerr << "CPU::decode: bit30, bits[30] is: "
-         << (parts.bit30 ? "1" : "0") << endl;
-    cerr << "CPU::decode: immediate is: "
-         << parts.immediate << endl;
+    // cerr << "CPU::decode: opcode, bits[6:0] is: "
+    //      << parts.opcode.to_string() << endl;
+    // cerr << "CPU::decode: rs1, bits[19:15] is: "
+    //      << parts.rs1.to_string() << endl;
+    // cerr << "CPU::decode: rs2, bits[24:20] is: "
+    //      << parts.rs2.to_string() << endl;
+    // cerr << "CPU::decode: rd, bits[11:7] is: "
+    //      << parts.rd.to_string() << endl;
+    // cerr << "CPU::decode: funct3, bits[14:12] is: "
+    //      << parts.funct3.to_string() << endl;
+    // cerr << "CPU::decode: bit30, bits[30] is: "
+    //      << (parts.bit30 ? "1" : "0") << endl;
+    // cerr << "CPU::decode: immediate is: "
+    //      << parts.immediate << endl;
 
     this->controller.setSignals(parts.opcode);
     return parts;
@@ -76,19 +81,19 @@ CPU::InstructionParts CPU::decode(uint32_t instruction)
 
 bool CPU::execute(CPU::InstructionParts const &parts)
 {
-    cerr << "CPU::execute: controller flags ref: |RW|AS|Br|MR|MW|tR|Ln|"
-         << endl;
-    cerr << "CPU::execute: controller flags are: |";
     using CS = ControllerSignals;
-    for (int signalId = 0; signalId < CS::NUM_SIGNALS; signalId++)
-    {
-        bool signal = this->controller.readSignal(static_cast<CS>(signalId));
-        cerr << (signal ? "1 |" : "0 |");
-    }
-    cerr << endl;
+    // cerr << "CPU::execute: controller flags ref: |RW|AS|Br|MR|MW|tR|Ln|"
+    //      << endl;
+    // cerr << "CPU::execute: controller flags are: |";
+    // for (int signalId = 0; signalId < CS::NUM_SIGNALS; signalId++)
+    // {
+    //     bool signal = this->controller.readSignal(static_cast<CS>(signalId));
+    //     cerr << (signal ? "1 |" : "0 |");
+    // }
+    // cerr << endl;
 
     ALUOp aluOp = this->controller.readALUOp();
-    cerr << "CPU::execute: ALUOp is: " << static_cast<int>(aluOp) << endl;
+    // cerr << "CPU::execute: ALUOp is: " << static_cast<int>(aluOp) << endl;
 
     // Terminate the moment we encounter an invalid instruction. The #end
     // "instruction" will result in this being hit, so this is also how we
@@ -112,6 +117,7 @@ bool CPU::execute(CPU::InstructionParts const &parts)
     cerr << "CPU::execute: aluOutput = " << aluOutput
          << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
 
+    // Determine what value to potentially write back to the register file.
     int32_t writebackValue;
     if (this->controller.readSignal(CS::MemRead))
         writebackValue = this->memUnit.readData(aluOutput);
@@ -122,19 +128,38 @@ bool CPU::execute(CPU::InstructionParts const &parts)
         this->memUnit.writeData(aluOutput, rs2Data);
 
     if (this->controller.readSignal(CS::RegWrite))
-        this->regFile.writeRegister(parts.rd.to_ulong(), writebackValue);
-
-    // Update the PC appropriately.
-    if (this->controller.readSignal(CS::Branch) && signFlag)
     {
-        this->PC += parts.immediate;
-        cerr << "CPU::execute: jumped by " << parts.immediate << " to address "
+        int32_t valueToWrite;
+        if (this->controller.readSignal(CS::Link))
+            valueToWrite = this->PC + 4;
+        else
+            valueToWrite = writebackValue;
+        this->regFile.writeRegister(parts.rd.to_ulong(), valueToWrite);
+    }
+
+    this->updatePC(parts.immediate, writebackValue);
+    return true;
+}
+
+void CPU::updatePC(int32_t immediate, int32_t writebackValue)
+{
+    using CS = ControllerSignals;
+    bool signFlag = this->alu.readSignFlag();
+
+    if (this->controller.readSignal(CS::Link))
+    {
+        this->PC = static_cast<uint32_t>(writebackValue & ~1);
+        cerr << "CPU::updatePC: linked to address " << this->PC << endl;
+    }
+    else if (this->controller.readSignal(CS::Branch) && signFlag)
+    {
+        uint32_t offset = static_cast<uint32_t>(immediate & ~1);
+        this->PC += offset;
+        cerr << "CPU::updatePC: jumped by " << offset << " to address "
              << this->PC << endl;
     }
     else
     {
         this->PC += 4;
     }
-
-    return true;
 }

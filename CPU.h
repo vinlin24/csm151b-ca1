@@ -99,4 +99,9 @@ private:
      * `false` if the program should terminate.
      */
     bool execute(InstructionParts const &parts);
+
+    /**
+     * Update the PC appropriately based on control flow.
+     */
+    void updatePC(int32_t immediate, int32_t writebackValue);
 };

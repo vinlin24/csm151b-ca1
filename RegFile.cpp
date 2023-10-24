@@ -25,6 +25,6 @@ void RegFile::writeRegister(uint8_t registerNum, int32_t data)
         return;
     }
     this->registers[registerNum] = data;
-    cerr << "RegFile::writeRegister: wrote " << data << " to x" << registerNum
-         << endl;
+    cerr << "RegFile::writeRegister: wrote " << data << " to x"
+         << static_cast<int>(registerNum) << endl;
 }
