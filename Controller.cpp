@@ -5,19 +5,6 @@
 
 using namespace std;
 
-namespace Opcodes
-{
-    enum Opcodes_
-    {
-        R_TYPE = 0b0110011,
-        I_TYPE = 0b0010011,
-        LW = 0b0000011,
-        SW = 0b0100011,
-        BLT = 0b1100011,
-        JALR = 0b1100111,
-    };
-}
-
 Controller::Controller()
 {
     this->flags = static_cast<ControllerFlags>(0);

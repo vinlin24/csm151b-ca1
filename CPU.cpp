@@ -47,10 +47,19 @@ static string spaceOutFlagBits(ControllerFlags cf)
 
 bool CPU::decode(Instruction *current)
 {
-    bitset<32> bits = current->instruction;
-    cerr << "CPU::decode: received instruction: " << bits.to_string() << endl;
-    bitset<7> opcode(bits.to_ulong() & 0x7F);
+    cerr << "CPU::decode: received instruction: "
+         << current->instruction.to_string() << endl;
+
+    // Split up the instruction as illustrated in the datapath design.
+    uint32_t bits = current->instruction.to_ulong();
+    bitset<7> opcode(bits & 0b1111111);
+    bitset<5> rs1((bits & (0b11111 << 15)) >> 15);
+    bitset<5> rs2((bits & (0b11111 << 20)) >> 20);
+    bitset<5> rd((bits & (0b11111 << 7)) >> 7);
     cerr << "CPU::decode: opcode, bits[6:0] is: " << opcode.to_string() << endl;
+    cerr << "CPU::decode: rs1, bits[19:15] is: " << rs1.to_string() << endl;
+    cerr << "CPU::decode: rs2, bits[24:20] is: " << rs2.to_string() << endl;
+    cerr << "CPU::decode: rd, bits[11:7] is: " << rd.to_string() << endl;
 
     this->controller.setSignals(opcode);
     ControllerFlags flags = this->controller.readFlags();
@@ -66,7 +75,12 @@ bool CPU::decode(Instruction *current)
     // Terminate the moment we encounter an invalid instruction. The #end
     // "instruction" will result in this being hit, so this is also how we
     // terminate normally.
-    return op != ALUOp::INVALID;
+    if (op == ALUOp::INVALID)
+        return false;
+
+    // TODO?
+
+    return true;
 }
 
 unsigned long CPU::readPC()

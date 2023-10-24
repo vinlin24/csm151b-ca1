@@ -22,6 +22,16 @@ enum class ControllerFlags
     Link = (1 << 6), // Custom flag for the JALR instruction.
 };
 
+enum Opcodes
+{
+    R_TYPE = 0b0110011,
+    I_TYPE = 0b0010011,
+    LW = 0b0000011,
+    SW = 0b0100011,
+    BLT = 0b1100011,
+    JALR = 0b1100111,
+};
+
 static inline ControllerFlags operator|(ControllerFlags a, ControllerFlags b)
 {
     return static_cast<ControllerFlags>(

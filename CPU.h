@@ -6,6 +6,7 @@
 
 #include "ALU.h"
 #include "Controller.h"
+#include "ImmGen.h"
 #include "RegFile.h"
 
 class Instruction
@@ -41,6 +42,11 @@ private:
      * stored in the registers.
      */
     RegFile regfile;
+    /**
+     * Immediate generator unit responsible for extracting and sign extending
+     * immediates encoded in the instruction.
+     */
+    ImmGen immgen;
     /**
      * Unit responsible for resolving the ALUOp control signal and func3, funct7
      * segments into the correct operation for the ALU.
