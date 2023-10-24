@@ -7,57 +7,78 @@ using namespace std;
 
 Controller::Controller()
 {
-    this->flags = static_cast<ControllerFlags>(0);
-    this->op = ALUOp::INVALID;
+    this->clearSignals();
+}
+
+void Controller::clearSignals()
+{
+    for (int i = 0; i < ControllerSignals::NUM_SIGNALS; i++)
+        this->signals[i] = false;
+    this->aluOp = ALUOp::INVALID;
+}
+
+bool Controller::readSignal(ControllerSignals signalId) const
+{
+    return this->signals[signalId];
+}
+
+ALUOp Controller::readALUOp() const
+{
+    return this->aluOp;
 }
 
 void Controller::setSignals(bitset<7> opcode)
 {
-    using CF = ControllerFlags;
-    unsigned long bitPattern = opcode.to_ulong();
+    this->clearSignals();
 
-    switch (bitPattern)
+    using CS = ControllerSignals;
+    switch (opcode.to_ulong())
     {
     case Opcodes::R_TYPE:
         cerr << "Controller::setSignals: instruction type is R-Type" << endl;
-        this->flags = CF::RegWrite;
-        this->op = ALUOp::FUNC;
+        this->signals[CS::RegWrite] = true;
+        this->aluOp = ALUOp::FUNC;
         break;
 
     case Opcodes::I_TYPE:
         cerr << "Controller::setSignals: instruction type is I-Type" << endl;
-        this->flags = CF::RegWrite | CF::AluSrc;
-        this->op = ALUOp::FUNC;
+        this->signals[CS::RegWrite] = true;
+        this->signals[CS::AluSrc] = true;
+        this->aluOp = ALUOp::FUNC;
         break;
 
     case Opcodes::LW:
         cerr << "Controller::setSignals: instruction type is LW" << endl;
-        this->flags = CF::RegWrite | CF::AluSrc | CF::MemRead | CF::MemToReg;
-        this->op = ALUOp::ADD;
+        this->signals[CS::RegWrite] = true;
+        this->signals[CS::AluSrc] = true;
+        this->signals[CS::MemRead] = true;
+        this->signals[CS::MemToReg] = true;
+        this->aluOp = ALUOp::ADD;
         break;
 
     case Opcodes::SW:
         cerr << "Controller::setSignals: instruction type is SW" << endl;
-        this->flags = CF::AluSrc | CF::MemWrite;
-        this->op = ALUOp::ADD;
+        this->signals[CS::AluSrc] = true;
+        this->signals[CS::MemWrite] = true;
+        this->aluOp = ALUOp::ADD;
         break;
 
     case Opcodes::BLT:
         cerr << "Controller::setSignals: instruction type is BLT" << endl;
-        this->flags = CF::Branch;
-        this->op = ALUOp::SUB;
+        this->signals[CS::Branch] = true;
+        this->aluOp = ALUOp::SUB;
         break;
 
     case Opcodes::JALR:
         cerr << "Controller::setSignals: instruction type is JALR" << endl;
-        this->flags = CF::RegWrite | CF::AluSrc | CF::Link;
-        this->op = ALUOp::ADD;
+        this->signals[CS::RegWrite] = true;
+        this->signals[CS::AluSrc] = true;
+        this->signals[CS::Link] = true;
+        this->aluOp = ALUOp::ADD;
         break;
 
     // Something went wrong.
     default:
         cerr << "Controller::setSignals: instruction type is invalid" << endl;
-        this->flags = static_cast<ControllerFlags>(0);
-        this->op = ALUOp::INVALID;
     }
 }

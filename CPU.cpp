@@ -30,21 +30,6 @@ bitset<32> CPU::fetch(bitset<8> *instructionMemory)
     return instruction;
 }
 
-/**
- * Helper function to format the output of the controller flags as a binary
- * string. For debugging purposes only.
- */
-static string spaceOutFlagBits(ControllerFlags cf)
-{
-    string result = "|";
-    bitset<7> bits(static_cast<int>(cf));
-    for (int i = 0; i < 7; i++)
-    {
-        result += bits[i] ? "1 |" : "0 |";
-    }
-    return result;
-}
-
 bool CPU::decode(Instruction *current)
 {
     cerr << "CPU::decode: received instruction: "
@@ -62,13 +47,20 @@ bool CPU::decode(Instruction *current)
     cerr << "CPU::decode: rd, bits[11:7] is: " << rd.to_string() << endl;
 
     this->controller.setSignals(opcode);
-    ControllerFlags flags = this->controller.readFlags();
-    ALUOp op = this->controller.readALUOp();
 
     cerr << "CPU::decode: controller flags ref: "
          << "|RW|AS|Br|MR|MW|tR|Ln|" << endl;
-    cerr << "CPU::decode: controller flags are: "
-         << spaceOutFlagBits(flags) << endl;
+    cerr << "CPU::decode: controller flags are: |";
+
+    using CS = ControllerSignals;
+    for (int signalId = 0; signalId < CS::NUM_SIGNALS; signalId++)
+    {
+        bool signal = this->controller.readSignal(static_cast<CS>(signalId));
+        cerr << (signal ? "1 |" : "0 |");
+    }
+    cerr << endl;
+
+    ALUOp op = this->controller.readALUOp();
     cerr << "CPU::decode: ALUOp is: "
          << static_cast<int>(op) << endl;
 
