@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string>
 
+#include "ALU.h"
 #include "Controller.h"
 #include "RegFile.h"
 
@@ -40,6 +41,10 @@ private:
      * stored in the registers.
      */
     RegFile regfile;
+    /**
+     * ALU responsible for performing arithmetic calculations.
+     */
+    ALU alu;
 
 public:
     CPU();
