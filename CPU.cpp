@@ -1,5 +1,7 @@
 #include "CPU.h"
 
+#include <iostream>
+
 using namespace std;
 
 Instruction::Instruction() {}
@@ -14,6 +16,15 @@ CPU::CPU()
     this->PC = 0;
 }
 
+bool CPU::runCycle(bitset<8> *instructionMemory)
+{
+    bitset<32> instruction = this->fetch(instructionMemory);
+    Instruction current(instruction);
+    InstructionParts parts = this->decode(&current);
+    bool stillRunning = this->execute(parts);
+    return stillRunning;
+}
+
 bitset<32> CPU::fetch(bitset<8> *instructionMemory)
 {
     // get 32 bit instruction
@@ -26,38 +37,49 @@ bitset<32> CPU::fetch(bitset<8> *instructionMemory)
     return instruction;
 }
 
-bool CPU::decode(Instruction *current)
+CPU::InstructionParts CPU::decode(Instruction *current)
 {
     cerr << "CPU::decode: received instruction: "
          << current->instruction.to_string() << endl;
 
     // Split up the instruction as illustrated in the datapath design.
+    InstructionParts parts;
     uint32_t bits = current->instruction.to_ulong();
-    bitset<7> opcode(bits & 0b1111111);
-    bitset<5> rs1((bits & (0b11111 << 15)) >> 15);
-    bitset<5> rs2((bits & (0b11111 << 20)) >> 20);
-    bitset<5> rd((bits & (0b11111 << 7)) >> 7);
-    bitset<3> funct3((bits & (0b111 << 12)) >> 12);
-    bool bit30 = (bits & (1 << 30));
+    parts.opcode = (bits & 0b1111111);
+    parts.rs1 = ((bits & (0b11111 << 15)) >> 15);
+    parts.rs2 = ((bits & (0b11111 << 20)) >> 20);
+    parts.rd = ((bits & (0b11111 << 7)) >> 7);
+    parts.funct3 = ((bits & (0b111 << 12)) >> 12);
+    parts.bit30 = (bits & (1 << 30));
+
+    // Also decode the immediate.
+    Opcodes opcodeBits = static_cast<Opcodes>(parts.opcode.to_ulong());
+    parts.immediate = this->immGen.generate(bits, opcodeBits);
+
     cerr << "CPU::decode: opcode, bits[6:0] is: "
-         << opcode.to_string() << endl;
+         << parts.opcode.to_string() << endl;
     cerr << "CPU::decode: rs1, bits[19:15] is: "
-         << rs1.to_string() << endl;
+         << parts.rs1.to_string() << endl;
     cerr << "CPU::decode: rs2, bits[24:20] is: "
-         << rs2.to_string() << endl;
+         << parts.rs2.to_string() << endl;
     cerr << "CPU::decode: rd, bits[11:7] is: "
-         << rd.to_string() << endl;
+         << parts.rd.to_string() << endl;
     cerr << "CPU::decode: funct3, bits[14:12] is: "
-         << funct3.to_string() << endl;
+         << parts.funct3.to_string() << endl;
     cerr << "CPU::decode: bit30, bits[30] is: "
-         << (bit30 ? "1" : "0") << endl;
+         << (parts.bit30 ? "1" : "0") << endl;
+    cerr << "CPU::decode: immediate is: "
+         << parts.immediate << endl;
 
-    this->controller.setSignals(opcode);
+    this->controller.setSignals(parts.opcode);
+    return parts;
+}
 
-    cerr << "CPU::decode: controller flags ref: "
-         << "|RW|AS|Br|MR|MW|tR|Ln|" << endl;
-    cerr << "CPU::decode: controller flags are: |";
-
+bool CPU::execute(CPU::InstructionParts const &parts)
+{
+    cerr << "CPU::execute: controller flags ref: |RW|AS|Br|MR|MW|tR|Ln|"
+         << endl;
+    cerr << "CPU::execute: controller flags are: |";
     using CS = ControllerSignals;
     for (int signalId = 0; signalId < CS::NUM_SIGNALS; signalId++)
     {
@@ -67,8 +89,7 @@ bool CPU::decode(Instruction *current)
     cerr << endl;
 
     ALUOp aluOp = this->controller.readALUOp();
-    cerr << "CPU::decode: ALUOp is: "
-         << static_cast<int>(aluOp) << endl;
+    cerr << "CPU::execute: ALUOp is: " << static_cast<int>(aluOp) << endl;
 
     // Terminate the moment we encounter an invalid instruction. The #end
     // "instruction" will result in this being hit, so this is also how we
@@ -76,20 +97,15 @@ bool CPU::decode(Instruction *current)
     if (aluOp == ALUOp::INVALID)
         return false;
 
-    // Execute. TODO: move this to own method(s)?
-
-    Opcodes opcodeBits = static_cast<Opcodes>(opcode.to_ulong());
-    int32_t immediate = this->immGen.generate(bits, opcodeBits);
-
-    int32_t rs1Data = this->regFile.readRegister(rs1.to_ulong());
-    int32_t rs2Data = this->regFile.readRegister(rs2.to_ulong());
+    int32_t rs1Data = this->regFile.readRegister(parts.rs1.to_ulong());
+    int32_t rs2Data = this->regFile.readRegister(parts.rs2.to_ulong());
 
     ALUOperation aluOperation = this->aluControl.resolveOperation(
-        aluOp, bit30, funct3);
+        aluOp, parts.bit30, parts.funct3);
 
     int32_t aluOutput;
     if (this->controller.readSignal(CS::AluSrc))
-        aluOutput = this->alu.compute(rs1Data, immediate, aluOperation);
+        aluOutput = this->alu.compute(rs1Data, parts.immediate, aluOperation);
     else
         aluOutput = this->alu.compute(rs1Data, rs2Data, aluOperation);
 
@@ -108,7 +124,7 @@ bool CPU::decode(Instruction *current)
         this->memUnit.writeData(aluOutput, rs2Data);
 
     if (this->controller.readSignal(CS::RegWrite))
-        this->regFile.writeRegister(rd.to_ulong(), writebackValue);
+        this->regFile.writeRegister(parts.rd.to_ulong(), writebackValue);
 
     return true;
 }

@@ -1,5 +1,4 @@
 #include <bitset>
-#include <iostream>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +23,25 @@ public:
 
 class CPU
 {
+public:
+    CPU();
+    /**
+     * Read the current value of the program counter (PC).
+     */
+    unsigned long readPC();
+
+    /**
+     * Top-level function that abstracts the fetch-decode-execute flow of one
+     * CPU clock cycle. Returns whether the CPU is still active i.e. `false` if
+     * the program should terminate.
+     */
+    bool runCycle(std::bitset<8> *instructionMemory);
+
+    /**
+     * View the value currently stored in the specific register.
+     */
+    int32_t peekRegister(uint8_t registerNum) const;
+
 private:
     /**
      * Program counter.
@@ -60,23 +78,35 @@ private:
      */
     MemUnit memUnit;
 
-public:
-    CPU();
     /**
-     * Read the current value of the program counter (PC).
+     * Parts extracted from an instruction. Each instruction may or may not use
+     * all of them.
      */
-    unsigned long readPC();
+    struct InstructionParts
+    {
+        std::bitset<7> opcode;
+        std::bitset<5> rs1;
+        std::bitset<5> rs2;
+        std::bitset<5> rd;
+        std::bitset<3> funct3;
+        bool bit30;
+        int32_t immediate;
+    };
+
     /**
      * Fetch the current 32-bit instruction from the instruction memory.
      */
     std::bitset<32> fetch(std::bitset<8> *instructionMemory);
+
     /**
-     * Decodes the given instruction and returns whether the CPU is still
-     * active i.e. `false` if the program should terminate.
+     * Decode the given instruction by setting the appropriate controller
+     * signals and returning the parsed parts of the instruction.
      */
-    bool decode(Instruction *instruction);
+    InstructionParts decode(Instruction *instruction);
+
     /**
-     * View the value currently stored in the specific register.
+     * Execute the instruction and returns whether the CPU is still active i.e.
+     * `false` if the program should terminate.
      */
-    int32_t peekRegister(uint8_t registerNum) const;
+    bool execute(InstructionParts const &parts);
 };

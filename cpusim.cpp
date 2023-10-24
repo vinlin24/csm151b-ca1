@@ -86,20 +86,8 @@ int main(int argc, char *argv[])
     int32_t a1Value = 0;
 
     // processor's main loop. Each iteration is equal to one clock cycle.
-    bool active = true;
-    while (active)
+    while (cpu.runCycle(instructionMemory))
     {
-        // fetch
-        current = cpu.fetch(instructionMemory); // fetching the instruction
-        instruction = Instruction(current);
-
-        // decode
-        active = cpu.decode(&instruction);
-
-        // break from loop so stats are not mistakenly updated
-        if (!active)
-            break;
-
         // Query the registers to test.
         a0Value = cpu.peekRegister(REG_A0);
         a1Value = cpu.peekRegister(REG_A1);
