@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         instructionMemory[i] = bitset<8>(x);
         i++;
     }
-    int maxPC = i;
+    unsigned long maxPC = i;
 
     /*
      * Instantiate your CPU object here. CPU class is the main class in this

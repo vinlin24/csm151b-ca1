@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string>
 
+#include "Controller.h"
+
 class Instruction
 {
 public:
@@ -26,6 +28,12 @@ private:
      * Program counter.
      */
     unsigned long PC;
+    /**
+     * Controller unit responsible for decoding the opcode part of the
+     * instruction and setting the control signals depending on the type of
+     * instruction.
+     */
+    Controller controller;
 
 public:
     CPU();
