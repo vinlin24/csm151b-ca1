@@ -10,6 +10,8 @@
 
 using namespace std;
 
+#define INSTRUCTION_MEMORY_SIZE 4096
+
 /**
  * a0 is the symbolic name for register x10.
  */
@@ -37,7 +39,7 @@ int main(int argc, char *argv[])
      * operands, etc.
      */
 
-    bitset<8> instructionMemory[4096];
+    bitset<8> instructionMemory[INSTRUCTION_MEMORY_SIZE];
 
     if (argc < 2)
     {
