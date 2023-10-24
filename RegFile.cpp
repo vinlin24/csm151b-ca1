@@ -1,4 +1,8 @@
+#include <iostream>
+
 #include "RegFile.h"
+
+using namespace std;
 
 RegFile::RegFile()
 {
@@ -13,8 +17,14 @@ uint32_t RegFile::readRegister(uint8_t registerNum) const
 
 void RegFile::writeRegister(uint8_t registerNum, uint32_t data)
 {
-    // X0 is hardwired to 0.
+    // x0 is hardwired to 0.
     if (registerNum == 0)
+    {
+        cerr << "RegFile::writeRegister: attempt to write to x0 ignored"
+             << endl;
         return;
+    }
     this->registers[registerNum] = data;
+    cerr << "RegFile::writeRegister: wrote " << data << " to x" << registerNum
+         << endl;
 }

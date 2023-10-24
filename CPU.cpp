@@ -41,10 +41,20 @@ bool CPU::decode(Instruction *current)
     bitset<5> rs1((bits & (0b11111 << 15)) >> 15);
     bitset<5> rs2((bits & (0b11111 << 20)) >> 20);
     bitset<5> rd((bits & (0b11111 << 7)) >> 7);
-    cerr << "CPU::decode: opcode, bits[6:0] is: " << opcode.to_string() << endl;
-    cerr << "CPU::decode: rs1, bits[19:15] is: " << rs1.to_string() << endl;
-    cerr << "CPU::decode: rs2, bits[24:20] is: " << rs2.to_string() << endl;
-    cerr << "CPU::decode: rd, bits[11:7] is: " << rd.to_string() << endl;
+    bitset<3> funct3((bits & (0b111 << 12)) >> 12);
+    bool bit30 = (bits & (1 << 30));
+    cerr << "CPU::decode: opcode, bits[6:0] is: "
+         << opcode.to_string() << endl;
+    cerr << "CPU::decode: rs1, bits[19:15] is: "
+         << rs1.to_string() << endl;
+    cerr << "CPU::decode: rs2, bits[24:20] is: "
+         << rs2.to_string() << endl;
+    cerr << "CPU::decode: rd, bits[11:7] is: "
+         << rd.to_string() << endl;
+    cerr << "CPU::decode: funct3, bits[14:12] is: "
+         << funct3.to_string() << endl;
+    cerr << "CPU::decode: bit30, bits[30] is: "
+         << (bit30 ? "1" : "0") << endl;
 
     this->controller.setSignals(opcode);
 
@@ -60,17 +70,43 @@ bool CPU::decode(Instruction *current)
     }
     cerr << endl;
 
-    ALUOp op = this->controller.readALUOp();
+    ALUOp aluOp = this->controller.readALUOp();
     cerr << "CPU::decode: ALUOp is: "
-         << static_cast<int>(op) << endl;
+         << static_cast<int>(aluOp) << endl;
 
     // Terminate the moment we encounter an invalid instruction. The #end
     // "instruction" will result in this being hit, so this is also how we
     // terminate normally.
-    if (op == ALUOp::INVALID)
+    if (aluOp == ALUOp::INVALID)
         return false;
 
-    // TODO?
+    // Execute. TODO: move this to own method(s)?
+
+    Opcodes opcodeBits = static_cast<Opcodes>(opcode.to_ulong());
+    int32_t immediate = this->immgen.generate(bits, opcodeBits);
+
+    uint32_t rs1Data = this->regfile.readRegister(rs1.to_ulong());
+    uint32_t rs2Data = this->regfile.readRegister(rs2.to_ulong());
+
+    ALUOperation aluOperation = this->aluControl.resolveOperation(
+        aluOp, bit30, funct3);
+
+    uint32_t aluOutput;
+    if (this->controller.readSignal(CS::AluSrc))
+        aluOutput = this->alu.compute(rs1Data, immediate, aluOperation);
+    else
+        aluOutput = this->alu.compute(rs1Data, rs2Data, aluOperation);
+
+    // TODO: do something with signFlag.
+    bool signFlag = this->alu.readSignFlag();
+    cerr << "CPU::decode: aluOutput = " << aluOutput
+         << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
+
+    // TODO: do something with memory. For now, assume the output of ALU goes
+    // straight to writeback.
+
+    if (this->controller.readSignal(CS::RegWrite))
+        this->regfile.writeRegister(rd.to_ulong(), aluOutput);
 
     return true;
 }
