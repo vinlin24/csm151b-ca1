@@ -14,28 +14,29 @@ class CPU
 {
 public:
     CPU();
+
     /**
      * Read the current value of the program counter (PC).
      */
-    unsigned long readPC();
-
-    /**
-     * Top-level function that abstracts the fetch-decode-execute flow of one
-     * CPU clock cycle. Returns whether the CPU is still active i.e. `false` if
-     * the program should terminate.
-     */
-    bool runCycle(std::bitset<8> *instructionMemory);
+    uint32_t readPC() const;
 
     /**
      * View the value currently stored in the specific register.
      */
     int32_t peekRegister(uint8_t registerNum) const;
 
+    /**
+     * Top-level function that abstracts the fetch-decode-execute flow of one
+     * CPU clock cycle. Return whether the CPU is still active i.e. `false` if
+     * the program should terminate.
+     */
+    bool runCycle(std::bitset<8> *instructionMemory);
+
 private:
     /**
      * Program counter.
      */
-    unsigned long PC;
+    uint32_t PC;
     /**
      * Controller unit responsible for decoding the opcode part of the
      * instruction and setting the control signals depending on the type of

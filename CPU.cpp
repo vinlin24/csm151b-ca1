@@ -9,6 +9,16 @@ CPU::CPU()
     this->PC = 0;
 }
 
+uint32_t CPU::readPC() const
+{
+    return this->PC;
+}
+
+int32_t CPU::peekRegister(uint8_t registerNum) const
+{
+    return this->regFile.readRegister(registerNum);
+}
+
 bool CPU::runCycle(bitset<8> *instructionMemory)
 {
     uint32_t instruction = this->fetch(instructionMemory);
@@ -117,14 +127,4 @@ bool CPU::execute(CPU::InstructionParts const &parts)
         this->regFile.writeRegister(parts.rd.to_ulong(), writebackValue);
 
     return true;
-}
-
-unsigned long CPU::readPC()
-{
-    return this->PC;
-}
-
-int32_t CPU::peekRegister(uint8_t registerNum) const
-{
-    return this->regFile.readRegister(registerNum);
 }
