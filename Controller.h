@@ -3,7 +3,7 @@
 
 #include <bitset>
 
-enum class ALUOp
+enum ALUOp
 {
     INVALID, // Some default for debugging I guess.
     FUNC,

@@ -42,6 +42,11 @@ private:
      */
     RegFile regfile;
     /**
+     * Unit responsible for resolving the ALUOp control signal and func3, funct7
+     * segments into the correct operation for the ALU.
+     */
+    ALUControl aluControl;
+    /**
      * ALU responsible for performing arithmetic calculations.
      */
     ALU alu;
