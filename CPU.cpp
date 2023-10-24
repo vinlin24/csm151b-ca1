@@ -12,10 +12,6 @@ Instruction::Instruction(bitset<32> fetch)
 CPU::CPU()
 {
     this->PC = 0;
-    for (int i = 0; i < 4096; i++)
-    {
-        this->dataMemory[i] = (0);
-    }
 }
 
 bitset<32> CPU::fetch(bitset<8> *instructionMemory)
@@ -83,10 +79,10 @@ bool CPU::decode(Instruction *current)
     // Execute. TODO: move this to own method(s)?
 
     Opcodes opcodeBits = static_cast<Opcodes>(opcode.to_ulong());
-    int32_t immediate = this->immgen.generate(bits, opcodeBits);
+    int32_t immediate = this->immGen.generate(bits, opcodeBits);
 
-    uint32_t rs1Data = this->regfile.readRegister(rs1.to_ulong());
-    uint32_t rs2Data = this->regfile.readRegister(rs2.to_ulong());
+    uint32_t rs1Data = this->regFile.readRegister(rs1.to_ulong());
+    uint32_t rs2Data = this->regFile.readRegister(rs2.to_ulong());
 
     ALUOperation aluOperation = this->aluControl.resolveOperation(
         aluOp, bit30, funct3);
@@ -106,7 +102,7 @@ bool CPU::decode(Instruction *current)
     // straight to writeback.
 
     if (this->controller.readSignal(CS::RegWrite))
-        this->regfile.writeRegister(rd.to_ulong(), aluOutput);
+        this->regFile.writeRegister(rd.to_ulong(), aluOutput);
 
     return true;
 }
@@ -118,5 +114,5 @@ unsigned long CPU::readPC()
 
 int32_t CPU::peekRegister(uint8_t registerNum) const
 {
-    return this->regfile.readRegister(registerNum);
+    return this->regFile.readRegister(registerNum);
 }

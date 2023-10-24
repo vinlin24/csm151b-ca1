@@ -8,6 +8,7 @@
 #include "ALU.h"
 #include "Controller.h"
 #include "ImmGen.h"
+#include "MemUnit.h"
 #include "RegFile.h"
 
 class Instruction
@@ -25,10 +26,6 @@ class CPU
 {
 private:
     /**
-     * Data memory byte addressable in Little Endian fashion.
-     */
-    int dataMemory[4096];
-    /**
      * Program counter.
      */
     unsigned long PC;
@@ -42,12 +39,12 @@ private:
      * Register file unit responsible for keeping track of the values currently
      * stored in the registers.
      */
-    RegFile regfile;
+    RegFile regFile;
     /**
      * Immediate generator unit responsible for extracting and sign extending
      * immediates encoded in the instruction.
      */
-    ImmGen immgen;
+    ImmGen immGen;
     /**
      * Unit responsible for resolving the ALUOp control signal and func3, funct7
      * segments into the correct operation for the ALU.
@@ -57,6 +54,11 @@ private:
      * ALU responsible for performing arithmetic calculations.
      */
     ALU alu;
+    /**
+     * Unit responsible for keeping track of the data memory available to CPU,
+     * with support for read/write operations.
+     */
+    MemUnit memUnit;
 
 public:
     CPU();
