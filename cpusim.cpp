@@ -85,6 +85,9 @@ int main(int argc, char *argv[])
         a0Value = cpu.peekRegister(REG_A0);
         a1Value = cpu.peekRegister(REG_A1);
 
+        // For debugging.
+        cpu.dumpState();
+
         // Sanity check.
         if (cpu.readPC() > maxPC)
             break;

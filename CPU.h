@@ -26,6 +26,11 @@ public:
     int32_t peekRegister(uint8_t registerNum) const;
 
     /**
+     * Dump debugging information about the current state of the CPU to stderr.
+     */
+    void dumpState() const;
+
+    /**
      * Top-level function that abstracts the fetch-decode-execute flow of one
      * CPU clock cycle. Return whether the CPU is still active i.e. `false` if
      * the program should terminate.

@@ -24,6 +24,29 @@ int32_t CPU::peekRegister(uint8_t registerNum) const
     return this->regFile.readRegister(registerNum);
 }
 
+void CPU::dumpState() const
+{
+    cerr << "========== New PC: 0x" << hex << this->PC << dec
+         << " ==========" << endl;
+
+    cerr << "[REGISTERS]" << endl;
+    for (uint8_t id = 0; id < NUM_REGISTERS; id++)
+    {
+        int32_t value = this->peekRegister(id);
+        if (value != 0)
+            cerr << "x" << static_cast<int>(id) << ": " << value << endl;
+    }
+
+    cerr << "[MEMORY]" << endl;
+    for (uint32_t word = 0; word < DATA_MEMORY_SIZE; word++)
+    {
+        uint32_t address = word * 4;
+        int32_t data = this->memUnit.readData(address);
+        if (data != 0)
+            cerr << "0x" << hex << address << dec << ": " << data << endl;
+    }
+}
+
 bool CPU::runCycle(bitset<8> *instructionMemory)
 {
     uint32_t instruction = this->fetch(instructionMemory);
@@ -38,7 +61,7 @@ uint32_t CPU::fetch(bitset<8> *instructionMemory)
                            ((instructionMemory[PC + 2].to_ulong()) << 16) +
                            ((instructionMemory[PC + 1].to_ulong()) << 8) +
                            (instructionMemory[PC + 0].to_ulong());
-    cerr << "\nCPU::fetch: PC=" << this->PC << endl;
+    // cerr << "\nCPU::fetch: PC=" << this->PC << endl;
     return instruction;
 }
 
@@ -113,9 +136,9 @@ bool CPU::execute(CPU::InstructionParts const &parts)
     else
         aluOutput = this->alu.compute(rs1Data, rs2Data, aluOperation);
 
-    bool signFlag = this->alu.readSignFlag();
-    cerr << "CPU::execute: aluOutput = " << aluOutput
-         << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
+    // bool signFlag = this->alu.readSignFlag();
+    // cerr << "CPU::execute: aluOutput = " << aluOutput
+    //      << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
 
     // Determine what value to potentially write back to the register file.
     int32_t writebackValue;
@@ -149,14 +172,14 @@ void CPU::updatePC(int32_t immediate, int32_t writebackValue)
     if (this->controller.readSignal(CS::Link))
     {
         this->PC = static_cast<uint32_t>(writebackValue & ~1);
-        cerr << "CPU::updatePC: linked to address " << this->PC << endl;
+        // cerr << "CPU::updatePC: linked to address " << this->PC << endl;
     }
     else if (this->controller.readSignal(CS::Branch) && signFlag)
     {
         uint32_t offset = static_cast<uint32_t>(immediate << 1);
         this->PC += offset;
-        cerr << "CPU::updatePC: jumped by " << offset << " to address "
-             << this->PC << endl;
+        // cerr << "CPU::updatePC: jumped by " << offset << " to address "
+        //      << this->PC << endl;
     }
     else
     {

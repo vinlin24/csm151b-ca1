@@ -35,20 +35,20 @@ void Controller::setSignals(bitset<7> opcode)
     switch (opcode.to_ulong())
     {
     case Opcodes::R_TYPE:
-        cerr << "Controller::setSignals: instruction type is R-Type" << endl;
+        // cerr << "Controller::setSignals: instruction type is R-Type" << endl;
         this->signals[CS::RegWrite] = true;
         this->aluOp = ALUOp::FUNC;
         break;
 
     case Opcodes::I_TYPE:
-        cerr << "Controller::setSignals: instruction type is I-Type" << endl;
+        // cerr << "Controller::setSignals: instruction type is I-Type" << endl;
         this->signals[CS::RegWrite] = true;
         this->signals[CS::AluSrc] = true;
         this->aluOp = ALUOp::FUNC;
         break;
 
     case Opcodes::LW:
-        cerr << "Controller::setSignals: instruction type is LW" << endl;
+        // cerr << "Controller::setSignals: instruction type is LW" << endl;
         this->signals[CS::RegWrite] = true;
         this->signals[CS::AluSrc] = true;
         this->signals[CS::MemRead] = true;
@@ -57,20 +57,20 @@ void Controller::setSignals(bitset<7> opcode)
         break;
 
     case Opcodes::SW:
-        cerr << "Controller::setSignals: instruction type is SW" << endl;
+        // cerr << "Controller::setSignals: instruction type is SW" << endl;
         this->signals[CS::AluSrc] = true;
         this->signals[CS::MemWrite] = true;
         this->aluOp = ALUOp::ADD;
         break;
 
     case Opcodes::BLT:
-        cerr << "Controller::setSignals: instruction type is BLT" << endl;
+        // cerr << "Controller::setSignals: instruction type is BLT" << endl;
         this->signals[CS::Branch] = true;
         this->aluOp = ALUOp::SUB;
         break;
 
     case Opcodes::JALR:
-        cerr << "Controller::setSignals: instruction type is JALR" << endl;
+        // cerr << "Controller::setSignals: instruction type is JALR" << endl;
         this->signals[CS::RegWrite] = true;
         this->signals[CS::AluSrc] = true;
         this->signals[CS::Link] = true;
@@ -79,6 +79,7 @@ void Controller::setSignals(bitset<7> opcode)
 
     // Something went wrong.
     default:
-        cerr << "Controller::setSignals: instruction type is invalid" << endl;
+        // cerr << "Controller::setSignals: instruction type is invalid" << endl;
+        break;
     }
 }
