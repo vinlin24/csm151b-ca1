@@ -13,6 +13,7 @@
 #		make test-r
 #		make test-sw
 #		make test-all
+#		make test1
 #
 # ===============================================
 
