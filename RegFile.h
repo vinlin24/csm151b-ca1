@@ -13,7 +13,7 @@ public:
     void writeRegister(uint8_t registerNum, int32_t data);
 
 private:
-    uint32_t registers[NUM_REGISTERS];
+    int32_t registers[NUM_REGISTERS];
 };
 
 #endif // REGFILE_H_INCLUDED

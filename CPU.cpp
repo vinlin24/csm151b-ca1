@@ -65,7 +65,7 @@ uint32_t CPU::fetch(bitset<8> *instructionMemory)
     return instruction;
 }
 
-CPU::InstructionParts CPU::decode(uint32_t instruction)
+InstructionParts CPU::decode(uint32_t instruction)
 {
     // cerr << "CPU::decode: received instruction: "
     //      << bitset<32>(instruction).to_string() << endl;
@@ -102,7 +102,7 @@ CPU::InstructionParts CPU::decode(uint32_t instruction)
     return parts;
 }
 
-bool CPU::execute(CPU::InstructionParts const &parts)
+bool CPU::execute(InstructionParts const &parts)
 {
     using CS = ControllerSignals;
     // cerr << "CPU::execute: controller flags ref: |RW|AS|Br|MR|MW|tR|Ln|"
@@ -127,8 +127,7 @@ bool CPU::execute(CPU::InstructionParts const &parts)
     int32_t rs1Data = this->regFile.readRegister(parts.rs1.to_ulong());
     int32_t rs2Data = this->regFile.readRegister(parts.rs2.to_ulong());
 
-    ALUOperation aluOperation = this->aluControl.resolveOperation(
-        aluOp, parts.bit30, parts.funct3);
+    ALUOperation aluOperation = this->aluControl.resolveOperation(aluOp, parts);
 
     int32_t aluOutput;
     if (this->controller.readSignal(CS::AluSrc))

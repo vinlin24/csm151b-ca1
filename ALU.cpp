@@ -1,5 +1,6 @@
 #include <bitset>
 #include <stdexcept>
+#include <iostream>
 
 #include "ALU.h"
 
@@ -43,7 +44,7 @@ bool ALU::readSignFlag() const
 }
 
 ALUOperation
-ALUControl::resolveOperation(ALUOp op, bool bit30, bitset<3> funct3) const
+ALUControl::resolveOperation(ALUOp op, InstructionParts const &parts) const
 {
     switch (op)
     {
@@ -52,15 +53,29 @@ ALUControl::resolveOperation(ALUOp op, bool bit30, bitset<3> funct3) const
     case ALUOp::SUB:
         return ALUOperation::ALU_SUB;
     case ALUOp::FUNC:
-        switch (funct3.to_ulong())
+        switch (parts.funct3.to_ulong())
         {
         case 0b000:
-            return bit30 ? ALUOperation::ALU_SUB : ALUOperation::ALU_ADD;
+            if (parts.opcode == Opcodes::I_TYPE) // addi
+            {
+                // cerr << "Resolved ALUOperation from funct: ALU_ADD" << endl;
+                return ALUOperation::ALU_ADD;
+            }
+            if (parts.bit30)
+            {
+                // cerr << "Resolved ALUOperation from funct: ALU_SUB" << endl;
+                return ALUOperation::ALU_SUB;
+            }
+            // cerr << "Resolved ALUOperation from funct: ALU_ADD" << endl;
+            return ALUOperation::ALU_ADD;
         case 0b100:
+            // cerr << "Resolved ALUOperation from funct: ALU_XOR" << endl;
             return ALUOperation::ALU_XOR;
         case 0b101:
+            // cerr << "Resolved ALUOperation from funct: ALU_SRA" << endl;
             return ALUOperation::ALU_SRA;
         case 0b111:
+            // cerr << "Resolved ALUOperation from funct: ALU_AND" << endl;
             return ALUOperation::ALU_AND;
         default:
             throw std::invalid_argument(

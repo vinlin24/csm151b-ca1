@@ -30,7 +30,7 @@ class ALUControl
 {
 public:
     ALUOperation
-    resolveOperation(ALUOp op, bool bit30, std::bitset<3> funct3) const;
+    resolveOperation(ALUOp op, InstructionParts const &parts) const;
 };
 
 #endif // ALU_H_INCLUDED
