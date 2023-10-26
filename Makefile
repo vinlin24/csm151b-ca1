@@ -8,12 +8,12 @@
 #
 #       make clean
 #
-# 	* To run individual tests:
+#   * To run individual tests:
 #
-#		make test-r
-#		make test-sw
-#		make test-all
-#		make test1
+#       make test-r
+#       make test-sw
+#       make test-all
+#       make test1
 #
 # ===============================================
 
