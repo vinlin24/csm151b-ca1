@@ -78,6 +78,9 @@ int main(int argc, char *argv[])
     int32_t a0Value = 0;
     int32_t a1Value = 0;
 
+    // For debugging.
+    cpu.dumpState();
+
     // Processor's main loop. Each iteration is equal to one clock cycle.
     while (cpu.runCycle(instructionMemory))
     {
