@@ -42,7 +42,7 @@ Finally, to implement BLT, it was just a matter of changing the **Zero** flag on
 
 My control signals are largely similar to how we defined them in class. The notable differences are that:
 
-* Instead of BEQ, we have BLT. However, consistent with the RISC-V ISA reference, I did not change any of its control signals. Instead, I simply made use of a new **Sign** flag on the ALU instead of the **Zero** flag, as described [above](#datapath-design).
+* Instead of BEQ, we have BLT. However, I did not change any of its control signals. Instead, I simply made use of a new **Sign** flag on the ALU instead of the **Zero** flag, as described [above](#datapath-design).
 * I have a new group for the JALR instruction, which also introduces a new control signal **Link** exclusive to it (1 for JALR, 0 for all other instruction groups in this architecture). JALR needs to write to registers and make use of an immediate operand, so it sets the **RegWrite** and **AluSrc** control signals in addition. It also makes use of addition to compute the address to jump to, so we set **ALUOp** to **ADD**.
 
 
@@ -50,7 +50,7 @@ My control signals are largely similar to how we defined them in class. The nota
 
 > **What is the total number of cycles for running "all" trace (ZERO instruction included)?**
 
-Since we're assuming a single-cycle processor design, the number of cycles to run the trace is simply equal to the number of assembly instructions provided in `23all.s`, which is 14. Adding one for the ZERO instruction (the program termination condition) gives us **15 total cycles**.
+Since we're assuming a single-cycle processor design, the number of cycles to run the trace is simply equal to the number of assembly instructions executed. Tracing through the assembly in `23all.s`, we get 12 lines of executed instructions (less than the total 14 because there are jumps that skip over some lines). This can be verified by stepping through the code line-by-line with [an online RISC-V interpreter](https://www.cs.cornell.edu/courses/cs3410/2019sp/riscv/interpreter/). Adding one for the ZERO instruction (the program termination condition) gives us **13 total cycles**.
 
 > **How many r-type instructions does this program ("all") have?**
 
