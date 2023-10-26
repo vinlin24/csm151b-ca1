@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
 
     // For debugging.
     cpu.dumpState();
+    int cyclesExecuted = 0;
 
     // Processor's main loop. Each iteration is equal to one clock cycle.
     while (cpu.runCycle(instructionMemory))
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
 
         // For debugging.
         cpu.dumpState();
+        cyclesExecuted++;
 
         // Sanity check.
         if (cpu.readPC() > maxPC)
@@ -98,6 +100,8 @@ int main(int argc, char *argv[])
 
     // Final one-line output, formatted the exact way described in the spec.
     cout << "(" << a0Value << "," << a1Value << ")" << endl;
+
+    cerr << "(Executed " << cyclesExecuted << " cycles)" << endl;
 
     return EXIT_SUCCESS;
 }
