@@ -33,9 +33,8 @@ void CPU::dumpState() const
     }
 
     cerr << "[MEMORY]" << endl;
-    for (uint32_t word = 0; word < DATA_MEMORY_SIZE; word++)
+    for (uint32_t address = 0; address < DATA_MEMORY_SIZE; address += 4)
     {
-        uint32_t address = word * 4;
         int32_t data = this->memUnit.readData(address);
         if (data != 0)
             cerr << "0x" << hex << address << dec << ": " << data << endl;
