@@ -35,7 +35,7 @@ public:
      * CPU clock cycle. Return whether the CPU is still active i.e. `false` if
      * the program should terminate.
      */
-    bool runCycle(std::bitset<8> *instructionMemory);
+    bool runCycle(std::bitset<8> const *instructionMemory);
 
 private:
     /**
@@ -76,7 +76,7 @@ private:
     /**
      * Fetch the current 32-bit instruction from the instruction memory.
      */
-    uint32_t fetch(std::bitset<8> *instructionMemory);
+    uint32_t fetch(std::bitset<8> const *instructionMemory);
 
     /**
      * Decode the given instruction by setting the appropriate controller

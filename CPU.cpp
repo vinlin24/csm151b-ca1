@@ -4,11 +4,6 @@
 
 using namespace std;
 
-/**
- * ra is the symbolic name for register x1.
- */
-#define REG_RA 1
-
 CPU::CPU()
 {
     this->PC = 0;
@@ -47,7 +42,7 @@ void CPU::dumpState() const
     }
 }
 
-bool CPU::runCycle(bitset<8> *instructionMemory)
+bool CPU::runCycle(bitset<8> const *instructionMemory)
 {
     uint32_t instruction = this->fetch(instructionMemory);
     InstructionParts parts = this->decode(instruction);
@@ -55,7 +50,7 @@ bool CPU::runCycle(bitset<8> *instructionMemory)
     return stillRunning;
 }
 
-uint32_t CPU::fetch(bitset<8> *instructionMemory)
+uint32_t CPU::fetch(bitset<8> const *instructionMemory)
 {
     uint32_t instruction = (((instructionMemory[PC + 3].to_ulong()) << 24)) +
                            ((instructionMemory[PC + 2].to_ulong()) << 16) +

@@ -62,7 +62,7 @@ static int32_t generateForBLT(uint32_t instruction)
     return immediate;
 }
 
-int32_t ImmGen::generate(uint32_t instruction, Opcodes opcode)
+int32_t ImmGen::generate(uint32_t instruction, Opcodes opcode) const
 {
     switch (opcode)
     {
