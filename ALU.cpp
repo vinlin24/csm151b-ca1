@@ -1,8 +1,6 @@
-#include <stdexcept>
+#include <cassert>
 
 #include "ALU.h"
-
-using namespace std;
 
 ALU::ALU()
 {
@@ -30,7 +28,8 @@ int32_t ALU::compute(int32_t input1, int32_t input2, ALUOperation operation)
         result = input1 & input2;
         break;
     default:
-        throw invalid_argument("ALU received unknown operation.");
+        // ALU received unknown operation.
+        assert(false);
     }
     this->signFlag = (result < 0);
     return result;
@@ -66,10 +65,11 @@ ALUControl::resolveOperation(ALUOp op, InstructionParts const &parts) const
         case 0b111:
             return ALUOperation::ALU_AND;
         default:
-            throw invalid_argument(
-                "Could not resolve operation with ALUOp=FUNC.");
+            // Could not resolve operation with ALUOp=FUNC.
+            assert(false);
         }
     default:
-        throw invalid_argument("Received invalid ALUOp.");
+        // Received invalid ALUOp.
+        assert(false);
     }
 }
