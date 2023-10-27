@@ -32,7 +32,7 @@ int32_t ALU::compute(int32_t input1, int32_t input2, ALUOperation operation)
         result = input1 & input2;
         break;
     default:
-        throw std::invalid_argument("ALU received unknown operation.");
+        throw invalid_argument("ALU received unknown operation.");
     }
     this->signFlag = (result < 0);
     return result;
@@ -78,10 +78,10 @@ ALUControl::resolveOperation(ALUOp op, InstructionParts const &parts) const
             // cerr << "Resolved ALUOperation from funct: ALU_AND" << endl;
             return ALUOperation::ALU_AND;
         default:
-            throw std::invalid_argument(
+            throw invalid_argument(
                 "Could not resolve operation with ALUOp=FUNC.");
         }
     default:
-        throw std::invalid_argument("Received invalid ALUOp.");
+        throw invalid_argument("Received invalid ALUOp.");
     }
 }
