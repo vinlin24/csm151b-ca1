@@ -14,14 +14,10 @@ MemUnit::MemUnit()
 int32_t MemUnit::readData(uint32_t address) const
 {
     int32_t word = this->dataMemory[address / 4];
-    // cerr << "MemUnit::readData: loaded " << word << " from address " << address
-    //      << endl;
     return word;
 }
 
 void MemUnit::writeData(uint32_t address, int32_t data)
 {
     this->dataMemory[address / 4] = data;
-    // cerr << "MemUnit::writeData: stored " << data << " at address " << address
-    //      << endl;
 }

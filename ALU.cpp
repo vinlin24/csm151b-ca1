@@ -57,25 +57,15 @@ ALUControl::resolveOperation(ALUOp op, InstructionParts const &parts) const
         {
         case 0b000:
             if (parts.opcode == Opcodes::I_TYPE) // addi
-            {
-                // cerr << "Resolved ALUOperation from funct: ALU_ADD" << endl;
                 return ALUOperation::ALU_ADD;
-            }
             if (parts.bit30)
-            {
-                // cerr << "Resolved ALUOperation from funct: ALU_SUB" << endl;
                 return ALUOperation::ALU_SUB;
-            }
-            // cerr << "Resolved ALUOperation from funct: ALU_ADD" << endl;
             return ALUOperation::ALU_ADD;
         case 0b100:
-            // cerr << "Resolved ALUOperation from funct: ALU_XOR" << endl;
             return ALUOperation::ALU_XOR;
         case 0b101:
-            // cerr << "Resolved ALUOperation from funct: ALU_SRA" << endl;
             return ALUOperation::ALU_SRA;
         case 0b111:
-            // cerr << "Resolved ALUOperation from funct: ALU_AND" << endl;
             return ALUOperation::ALU_AND;
         default:
             throw invalid_argument(

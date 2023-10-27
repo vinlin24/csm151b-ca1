@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     ifstream infile(argv[1]); // open the file
     if (!(infile.is_open() && infile.good()))
     {
-        cerr << "error opening file" << endl;
+        cerr << "Error opening file. Exiting..." << endl;
         return EXIT_FAILURE;
     }
 
