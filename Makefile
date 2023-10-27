@@ -23,8 +23,7 @@
 #                                                 #
 # =============================================== #
 
-# Attribution: compilation and linking rules partially paraphrased from output
-# of ChatGPT.
+# Attribution: SRCS and OBJS trick taken from output of ChatGPT.
 
 CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -Wpedantic
@@ -32,15 +31,14 @@ CXXFLAGS = -Wall -Werror -Wextra -Wpedantic
 OUTFILE = cpusim
 SRCS = $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
-HEADERS = $(wildcard *.h)
 
 # Directory containing the trace files.
 TRACES = traces
 
 default: $(OUTFILE)
 
-# .o and .h -> executable
-$(OUTFILE): $(OBJS) $(HEADERS)
+# .o -> executable
+$(OUTFILE): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
 # .cpp -> .o
@@ -50,22 +48,22 @@ $(OUTFILE): $(OBJS) $(HEADERS)
 clean:
 	rm -f $(OBJS) $(OUTFILE)
 
-test-r:
+test-r: $(OUTFILE)
 	@./$(OUTFILE) $(TRACES)/23instMem-r.txt
 	@[ "$$(./$(OUTFILE) $(TRACES)/23instMem-r.txt 2>/dev/null)" = "(-8,23)" ] \
 		|| (echo "FAIL: Expected (-8,23)" && false)
 
-test-sw:
+test-sw: $(OUTFILE)
 	@./$(OUTFILE) $(TRACES)/23instMem-sw.txt
 	@[ "$$(./$(OUTFILE) $(TRACES)/23instMem-sw.txt 2>/dev/null)" = "(9,17)" ] \
 		|| (echo "FAIL: Expected (9,17)" && false)
 
-test-all:
+test-all: $(OUTFILE)
 	@./$(OUTFILE) $(TRACES)/23instMem-all.txt
 	@[ "$$(./$(OUTFILE) $(TRACES)/23instMem-all.txt 2>/dev/null)" = "(40,1)" ] \
 		|| (echo "FAIL: Expected (40,1)" && false)
 
-test1:
+test1: $(OUTFILE)
 	@./$(OUTFILE) $(TRACES)/23instMem-test1.txt
 	@[ "$$(./$(OUTFILE) $(TRACES)/23instMem-test1.txt 2>/dev/null)" \
 		= "(46,-10)" ] || (echo "FAIL: Expected (46,-10)" && false)
