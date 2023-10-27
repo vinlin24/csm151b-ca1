@@ -1,6 +1,4 @@
-#include <bitset>
 #include <stdexcept>
-#include <iostream>
 
 #include "ALU.h"
 

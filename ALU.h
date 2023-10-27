@@ -1,10 +1,10 @@
 #ifndef ALU_H_INCLUDED
 #define ALU_H_INCLUDED
 
-#include <bitset>
 #include <stdint.h>
 
 #include "Controller.h"
+#include "Instruction.h"
 
 enum ALUOperation
 {

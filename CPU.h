@@ -3,6 +3,7 @@
 #include "ALU.h"
 #include "Controller.h"
 #include "ImmGen.h"
+#include "Instruction.h"
 #include "MemUnit.h"
 #include "RegFile.h"
 
