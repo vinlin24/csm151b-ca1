@@ -1,7 +1,7 @@
-#include <bitset>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -21,39 +21,13 @@ using namespace std;
  */
 #define REG_A1 11
 
-/*
- * This is the front end of your project. You need to first read the
- * instructions that are stored in a file and load them into an instruction
- * memory.
+/**
+ * Initialize the instruction memory array from the contents of a byte stream in
+ * the instMem format.
  */
-int main(int argc, char *argv[])
+static uint32_t initializeInstructionMemory(ifstream &infile,
+                                            uint8_t *instructionMemory)
 {
-    /*
-     * Each cell should store 1 byte. You can define the memory either
-     * dynamically, or define it as a fixed size with size 4KB (i.e., 4096
-     * lines). Each instruction is 32 bits (i.e., 4 lines, saved in
-     * little-endian mode). Each line in the input file is stored as an unsigned
-     * char and is 1 byte (each four lines are one instruction). You need to
-     * read the file line by line and store it into the memory. You may need a
-     * mechanism to convert these values to bits so that you can read opcodes,
-     * operands, etc.
-     */
-
-    bitset<8> instructionMemory[INSTRUCTION_MEMORY_SIZE];
-
-    if (argc < 2)
-    {
-        cerr << "No file name entered. Exiting..." << endl;
-        return EINVAL;
-    }
-
-    ifstream infile(argv[1]); // open the file
-    if (!(infile.is_open() && infile.good()))
-    {
-        cerr << "Error opening file. Exiting..." << endl;
-        return EXIT_FAILURE;
-    }
-
     string line;
     int i = 0;
     while (infile)
@@ -62,17 +36,35 @@ int main(int argc, char *argv[])
         stringstream line2(line);
         int x;
         line2 >> x;
-        instructionMemory[i] = bitset<8>(x);
+        instructionMemory[i] = x;
         i++;
     }
-    unsigned long maxPC = i;
+    uint32_t maxPC = i;
+    return maxPC;
+}
 
-    /*
-     * Instantiate your CPU object here. CPU class is the main class in this
-     * project that defines different components of the processor. CPU class
-     * also has different functions for each stage (e.g., fetching an
-     * instruction, decoding, etc.).
-     */
+/*
+ * This is the front end of your project. You need to first read the
+ * instructions that are stored in a file and load them into an instruction
+ * memory.
+ */
+int main(int argc, char *argv[])
+{
+    if (argc < 2)
+    {
+        cerr << "No file name entered. Exiting..." << endl;
+        return EINVAL;
+    }
+
+    ifstream infile(argv[1]);
+    if (!(infile.is_open() && infile.good()))
+    {
+        cerr << "Error opening file. Exiting..." << endl;
+        return EXIT_FAILURE;
+    }
+
+    uint8_t instructionMemory[INSTRUCTION_MEMORY_SIZE];
+    uint32_t maxPC = initializeInstructionMemory(infile, instructionMemory);
 
     CPU cpu;
     int32_t a0Value = 0;

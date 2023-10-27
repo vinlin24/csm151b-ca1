@@ -1,8 +1,4 @@
-#include <bitset>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
 
 #include "ALU.h"
 #include "Controller.h"
@@ -35,7 +31,7 @@ public:
      * CPU clock cycle. Return whether the CPU is still active i.e. `false` if
      * the program should terminate.
      */
-    bool runCycle(std::bitset<8> const *instructionMemory);
+    bool runCycle(uint8_t const *instructionMemory);
 
 private:
     /**
@@ -76,7 +72,7 @@ private:
     /**
      * Fetch the current 32-bit instruction from the instruction memory.
      */
-    uint32_t fetch(std::bitset<8> const *instructionMemory);
+    uint32_t fetch(uint8_t const *instructionMemory);
 
     /**
      * Decode the given instruction by setting the appropriate controller

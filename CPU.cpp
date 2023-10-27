@@ -42,7 +42,7 @@ void CPU::dumpState() const
     }
 }
 
-bool CPU::runCycle(bitset<8> const *instructionMemory)
+bool CPU::runCycle(uint8_t const *instructionMemory)
 {
     uint32_t instruction = this->fetch(instructionMemory);
     InstructionParts parts = this->decode(instruction);
@@ -50,12 +50,12 @@ bool CPU::runCycle(bitset<8> const *instructionMemory)
     return stillRunning;
 }
 
-uint32_t CPU::fetch(bitset<8> const *instructionMemory)
+uint32_t CPU::fetch(uint8_t const *instructionMemory)
 {
-    uint32_t instruction = (((instructionMemory[PC + 3].to_ulong()) << 24)) +
-                           ((instructionMemory[PC + 2].to_ulong()) << 16) +
-                           ((instructionMemory[PC + 1].to_ulong()) << 8) +
-                           (instructionMemory[PC + 0].to_ulong());
+    uint32_t instruction = (((instructionMemory[PC + 3]) << 24)) +
+                           ((instructionMemory[PC + 2]) << 16) +
+                           ((instructionMemory[PC + 1]) << 8) +
+                           (instructionMemory[PC + 0]);
     return instruction;
 }
 
