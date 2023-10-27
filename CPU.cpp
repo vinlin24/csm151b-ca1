@@ -116,14 +116,18 @@ bool CPU::execute(InstructionParts const &parts)
     // Terminate the moment we encounter an invalid instruction. The #end
     // "instruction" will result in this being hit, so this is also how we
     // terminate normally.
+
     if (aluOp == ALUOp::INVALID)
         return false;
+
+    // RegFile: Read register data, regardless if they will be used this cycle.
 
     int32_t rs1Data = this->regFile.readRegister(parts.rs1.to_ulong());
     int32_t rs2Data = this->regFile.readRegister(parts.rs2.to_ulong());
 
-    ALUOperation aluOperation = this->aluControl.resolveOperation(aluOp, parts);
+    // ALU: Determine the operation & operands and execute.
 
+    ALUOperation aluOperation = this->aluControl.resolveOperation(aluOp, parts);
     int32_t aluOutput;
     if (this->controller.readSignal(CS::AluSrc))
         aluOutput = this->alu.compute(rs1Data, parts.immediate, aluOperation);
@@ -134,15 +138,21 @@ bool CPU::execute(InstructionParts const &parts)
     // cerr << "CPU::execute: aluOutput = " << aluOutput
     //      << " (signFlag=" << (signFlag ? "1)" : "0)") << endl;
 
-    // Determine what value to potentially write back to the register file.
+    // Memory: Write to memory if applicable.
+
+    if (this->controller.readSignal(CS::MemWrite))
+        this->memUnit.writeData(aluOutput, rs2Data);
+
+    // Writeback: Determine what value to potentially write back to the
+    // destination register.
+
     int32_t writebackValue;
     if (this->controller.readSignal(CS::MemRead))
         writebackValue = this->memUnit.readData(aluOutput);
     else
         writebackValue = aluOutput;
 
-    if (this->controller.readSignal(CS::MemWrite))
-        this->memUnit.writeData(aluOutput, rs2Data);
+    // Writeback: Write back to the destination register if applicable.
 
     if (this->controller.readSignal(CS::RegWrite))
     {
@@ -163,11 +173,13 @@ void CPU::updatePC(int32_t immediate, int32_t writebackValue)
     using CS = ControllerSignals;
     bool signFlag = this->alu.readSignFlag();
 
+    // This is a link instruction, so we should set the PC to what we computed.
     if (this->controller.readSignal(CS::Link))
     {
         this->PC = static_cast<uint32_t>(writebackValue & ~1);
         // cerr << "CPU::updatePC: linked to address " << this->PC << endl;
     }
+    // This is a branch instruction, so we should add an offset to the PC.
     else if (this->controller.readSignal(CS::Branch) && signFlag)
     {
         uint32_t offset = static_cast<uint32_t>(immediate << 1);
@@ -175,6 +187,7 @@ void CPU::updatePC(int32_t immediate, int32_t writebackValue)
         // cerr << "CPU::updatePC: jumped by " << offset << " to address "
         //      << this->PC << endl;
     }
+    // Otherwise simply step to the next instruction in memory.
     else
     {
         this->PC += 4;
