@@ -1,7 +1,6 @@
-#include <bitset>
-#include <iostream>
-
 #include "Controller.h"
+
+#include <bitset>
 
 using namespace std;
 

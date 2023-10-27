@@ -1,7 +1,7 @@
 #ifndef IMMGEN_H_INCLUDED
 #define IMMGEN_H_INCLUDED
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "Controller.h"
 

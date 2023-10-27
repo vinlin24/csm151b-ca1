@@ -1,8 +1,4 @@
-#include <iostream>
-
 #include "RegFile.h"
-
-using namespace std;
 
 RegFile::RegFile()
 {

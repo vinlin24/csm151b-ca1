@@ -1,7 +1,7 @@
 #ifndef MEMUNIT_H_INCLUDED
 #define MEMUNIT_H_INCLUDED
 
-#include <stdint.h>
+#include <cstdint>
 
 /**
  * Size of the data memory available to the CPU, measured in words (4-byte

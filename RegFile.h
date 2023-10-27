@@ -1,7 +1,7 @@
 #ifndef REGFILE_H_INCLUDED
 #define REGFILE_H_INCLUDED
 
-#include <stdint.h>
+#include <cstdint>
 
 #define NUM_REGISTERS 32
 

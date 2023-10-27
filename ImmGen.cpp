@@ -1,6 +1,6 @@
-#include <bitset>
-
 #include "ImmGen.h"
+
+#include <bitset>
 
 using namespace std;
 

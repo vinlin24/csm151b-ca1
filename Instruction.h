@@ -2,7 +2,7 @@
 #define INSTRUCTION_H_INCLUDED
 
 #include <bitset>
-#include <stdint.h>
+#include <cstdint>
 
 /**
  * Parts extracted from an instruction. Each instruction may or may not use

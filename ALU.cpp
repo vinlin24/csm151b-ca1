@@ -1,6 +1,6 @@
-#include <cassert>
-
 #include "ALU.h"
+
+#include <cassert>
 
 ALU::ALU()
 {

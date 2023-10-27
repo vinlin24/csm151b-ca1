@@ -1,7 +1,7 @@
 #ifndef ALU_H_INCLUDED
 #define ALU_H_INCLUDED
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "Controller.h"
 #include "Instruction.h"

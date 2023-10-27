@@ -1,9 +1,6 @@
 #include "MemUnit.h"
 
-#include <iostream>
-#include <stddef.h>
-
-using namespace std;
+#include <cstddef>
 
 MemUnit::MemUnit()
 {

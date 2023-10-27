@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 
 #include "ALU.h"
 #include "Controller.h"
